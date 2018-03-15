@@ -67,6 +67,7 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
     angles_to_jsbsim_ = Angles(0, Angles::Type::EUCLIDEAN, Angles::Type::GPS);
 
     use_pitch_ = str2bool(params.at("use_pitch"));
+    use_speed_ = str2bool(params.at("use_speed"));
     std::string z_name =  use_pitch_ ?
         vars_.type_map().at(VariableIO::Type::desired_pitch) :
         vars_.type_map().at(VariableIO::Type::desired_altitude);
@@ -160,7 +161,12 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
 
     // desired_heading_node_ = mgr->GetNode("guidance/specified-heading-rad");
     desired_altitude_node_ = mgr->GetNode("ap/altitude_setpoint");
-    desired_velocity_node_ = mgr->GetNode("ap/airspeed_setpoint");
+    if (use_speed_) {
+        desired_velocity_node_ = mgr->GetNode("fcs/throttle-cmd-norm");
+    }else {
+        desired_velocity_node_ = mgr->GetNode("ap/airspeed_setpoint");
+    }
+
     bank_setpoint_node_ = mgr->GetNode("ap/bank_setpoint");
     fcs_elevator_cmd_node_ = mgr->GetNode("fcs/elevator-cmd-norm");
 
@@ -227,7 +233,17 @@ bool JSBSimModel::step(double time, double dt) {
         desired_altitude_node_->setDoubleValue(alt_result * meters2feet);
     }
     // set desired velocity
-    desired_velocity_node_->setDoubleValue(desired_velocity * mps2knts);
+    if (use_speed_) {
+        // Thrust Setpoint
+        exec_->GetPropertyManager()->GetNode("ap/airspeed_hold")->setDoubleValue(0);
+        // Needed to prevent JSBSim from breaking
+        if (time > 0) {
+            desired_velocity_node_->setDoubleValue(desired_velocity);
+        }
+    } else {
+        // Velocity setpoint
+        desired_velocity_node_->setDoubleValue(desired_velocity * mps2knts);
+    }
 
     /////////////////////
     exec_->Setdt(dt);

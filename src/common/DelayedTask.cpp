@@ -43,7 +43,7 @@ DelayedTask::DelayedTask(double _delay, int repeats) :
         delay(_delay),
         last_updated_time(-std::numeric_limits<double>::infinity()),
         end_time(std::numeric_limits<double>::infinity()),
-        eps(0.0),
+        eps(0.0000001),
         condition(nullptr),
         task(nullptr),
         repeat_infinitely_(true),
@@ -59,7 +59,6 @@ std::pair<bool, bool> DelayedTask::update(double t) {
     bool updated = false, task_success = true;
     const bool condition_satisfied = condition ? condition(t) : true;
     const bool time_good = t >= last_updated_time + delay - eps && t <= end_time + eps;
-
     if (!disable && !done() && condition_satisfied && time_good) {
         last_updated_time = t;
         if (task) {

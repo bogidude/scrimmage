@@ -114,6 +114,7 @@ class JSBSimModel : public MotionModel {
     double dt_;
 #endif
     bool use_pitch_ = false;
+    bool use_speed_ = false;
 
     int speed_idx_ = 0;
     int roll_idx_ = 0;
