@@ -747,6 +747,8 @@ bool SimControl::run_single_step(int loop_number) {
     if (!run_entities()) {
         if (!limited_verbosity_) {
             std::cout << "Exiting due to plugin request." << std::endl;
+            run_networks();
+            run_metrics();
         }
         return false;
     }

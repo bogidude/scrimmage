@@ -36,6 +36,7 @@
 #include <scrimmage/motion/MotionModel.h>
 #include <scrimmage/common/PID.h>
 #include <scrimmage/math/Angles.h>
+#include <scrimmage/entity/Entity.h>
 
 #if ENABLE_JSBSIM == 1
 #include <FGFDMExec.h>
@@ -69,7 +70,9 @@ class JSBSimModel : public MotionModel {
 
     virtual void teleport(StatePtr &state);
 
-    bool use_pitch() { return use_pitch_; }
+    bool use_pitch() { return use_pitch_; };
+    virtual void set_thrust(bool desired_thrust);
+    virtual void set_pitch(bool use_pit);
 
  protected:
 #if ENABLE_JSBSIM == 1
@@ -88,6 +91,7 @@ class JSBSimModel : public MotionModel {
     JSBSim::FGPropertyNode *desired_heading_node_;
     JSBSim::FGPropertyNode *desired_altitude_node_;
     JSBSim::FGPropertyNode *desired_velocity_node_;
+    JSBSim::FGPropertyNode *desired_throttle_node_;
     JSBSim::FGPropertyNode *bank_setpoint_node_;
 
     JSBSim::FGPropertyNode *vel_north_node_;
@@ -114,7 +118,7 @@ class JSBSimModel : public MotionModel {
     double dt_;
 #endif
     bool use_pitch_ = false;
-    bool use_speed_ = false;
+    bool use_thrust_ = false;
 
     int speed_idx_ = 0;
     int roll_idx_ = 0;

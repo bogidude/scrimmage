@@ -3,7 +3,7 @@
 <params>
   <library>JSBSimModel_plugin</library>  
   <use_pitch>false</use_pitch>
-  <use_speed>false</use_speed>
+  <use_thrust>false</use_thrust>
 
   <flightgear_output_enable>false</flightgear_output_enable>
   <flightgear_ip>localhost</flightgear_ip>

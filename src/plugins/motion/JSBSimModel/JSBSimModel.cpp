@@ -67,7 +67,7 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
     angles_to_jsbsim_ = Angles(0, Angles::Type::EUCLIDEAN, Angles::Type::GPS);
 
     use_pitch_ = str2bool(params.at("use_pitch"));
-    use_speed_ = str2bool(params.at("use_speed"));
+    use_speed_ = str2bool(params.at("use_thrust"));
     std::string z_name =  use_pitch_ ?
         vars_.type_map().at(VariableIO::Type::desired_pitch) :
         vars_.type_map().at(VariableIO::Type::desired_altitude);
@@ -161,11 +161,8 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
 
     // desired_heading_node_ = mgr->GetNode("guidance/specified-heading-rad");
     desired_altitude_node_ = mgr->GetNode("ap/altitude_setpoint");
-    if (use_speed_) {
-        desired_velocity_node_ = mgr->GetNode("fcs/throttle-cmd-norm");
-    }else {
-        desired_velocity_node_ = mgr->GetNode("ap/airspeed_setpoint");
-    }
+    desired_throttle_node_ = mgr->GetNode("fcs/throttle-cmd-norm");
+    desired_velocity_node_ = mgr->GetNode("ap/airspeed_setpoint");
 
     bank_setpoint_node_ = mgr->GetNode("ap/bank_setpoint");
     fcs_elevator_cmd_node_ = mgr->GetNode("fcs/elevator-cmd-norm");
@@ -206,6 +203,13 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
 
     return true;
 }
+void JSBSimModel::set_pitch(bool use_pit) {
+    use_pitch_ = use_pit;
+}
+
+void JSBSimModel::set_thrust(bool desired_thrust) {
+    use_thrust_ = desired_thrust;
+}
 
 bool JSBSimModel::step(double time, double dt) {
     double desired_velocity = vars_.input(speed_idx_);
@@ -219,7 +223,6 @@ bool JSBSimModel::step(double time, double dt) {
         // Negate altitude PID from the elevator control
         elevator_cmd -= exec_->GetPropertyValue("ap/elevator_cmd");
         fcs_elevator_cmd_node_->setDoubleValue(elevator_cmd);
-
         // Try to remove altitude control by putting setpoint to current altitude
         desired_altitude_node_->setDoubleValue(state_->pos()(2) * meters2feet);
     } else {
@@ -230,21 +233,22 @@ bool JSBSimModel::step(double time, double dt) {
         parent_->projection()->Reverse(state_->pos()(0), state_->pos()(1), desired_alt,
                                        lat_curr, lon_curr, alt_result);
 
+        fcs_elevator_cmd_node_->setDoubleValue(0);
         desired_altitude_node_->setDoubleValue(alt_result * meters2feet);
     }
     // set desired velocity
-    if (use_speed_) {
-        // Thrust Setpoint
-        exec_->GetPropertyManager()->GetNode("ap/airspeed_hold")->setDoubleValue(0);
+    if (use_thrust_) {
         // Needed to prevent JSBSim from breaking
         if (time > 0) {
-            desired_velocity_node_->setDoubleValue(desired_velocity);
+            exec_->GetPropertyManager()->GetNode("ap/airspeed_hold")->setDoubleValue(0);
+            // Thrust Setpoint
+            desired_throttle_node_->setDoubleValue(desired_velocity);
         }
     } else {
         // Velocity setpoint
+        exec_->GetPropertyManager()->GetNode("ap/airspeed_hold")->setDoubleValue(1);
         desired_velocity_node_->setDoubleValue(desired_velocity * mps2knts);
     }
-
     /////////////////////
     exec_->Setdt(dt);
     exec_->Run();
