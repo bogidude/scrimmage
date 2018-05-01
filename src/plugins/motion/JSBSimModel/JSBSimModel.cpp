@@ -67,7 +67,7 @@ bool JSBSimModel::init(std::map<std::string, std::string> &info,
     angles_to_jsbsim_ = Angles(0, Angles::Type::EUCLIDEAN, Angles::Type::GPS);
 
     use_pitch_ = str2bool(params.at("use_pitch"));
-    use_speed_ = str2bool(params.at("use_thrust"));
+    use_thrust_ = str2bool(params.at("use_thrust"));
     std::string z_name =  use_pitch_ ?
         vars_.type_map().at(VariableIO::Type::desired_pitch) :
         vars_.type_map().at(VariableIO::Type::desired_altitude);
