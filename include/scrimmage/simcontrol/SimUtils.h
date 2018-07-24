@@ -73,6 +73,8 @@ void print_io_error(const std::string &in_name, VariableIO &v);
 
 bool verify_io_connection(VariableIO &output_plugin, VariableIO &input_plugin);
 
+boost::optional<std::string> run_test(std::string mission, SimControl &simcontrol);
+
 boost::optional<std::string> run_test(std::string mission);
 
 bool logging_logic(MissionParsePtr mp, std::string s);

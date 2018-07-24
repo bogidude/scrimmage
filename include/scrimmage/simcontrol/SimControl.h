@@ -118,6 +118,7 @@ class SimControl {
     std::list<MetricsPtr> & metrics();
     PluginManagerPtr &plugin_manager();
     FileSearchPtr &file_search();
+    std::shared_ptr<Log> &log();
 
     struct Task {
         EntityPtr ent;

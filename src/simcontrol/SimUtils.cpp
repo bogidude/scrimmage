@@ -199,14 +199,14 @@ std::function<void(int)> shutdown_handler;
 void signal_handler(int signal) { shutdown_handler(signal); }
 } // namespace
 
-boost::optional<std::string> run_test(std::string mission) {
+boost::optional<std::string> run_test(std::string mission, SimControl &simcontrol) {
 
     auto found_mission = FileSearch().find_mission(mission);
     if (!found_mission) {
         std::cout << "scrimmage::run_test could not find " << mission << std::endl;
         return boost::none;
     } else {
-        SimControl simcontrol;
+        // SimControl simcontrol;
 
         // Handle kill signals
         struct sigaction sa;
@@ -238,6 +238,11 @@ boost::optional<std::string> run_test(std::string mission) {
 
         return postprocess_scrimmage(mp, simcontrol, log);
     }
+}
+
+boost::optional<std::string> run_test(std::string mission) {
+    SimControl simcontrol;
+    return run_test(mission, simcontrol);
 }
 
 bool logging_logic(MissionParsePtr mp, std::string s) {
@@ -342,7 +347,7 @@ boost::optional<std::string> postprocess_scrimmage(
         std::cout << "Simulation Complete" << std::endl;
     }
 
-    simcontrol.close();
+    // simcontrol.close();
     return mp->log_dir();
 }
 

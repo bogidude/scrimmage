@@ -952,6 +952,8 @@ PluginManagerPtr &SimControl::plugin_manager() {return plugin_manager_;}
 
 FileSearchPtr &SimControl::file_search() {return file_search_;}
 
+std::shared_ptr<Log> &SimControl::log() {return log_;}
+
 bool SimControl::take_step() {
     take_step_mutex_.lock();
     bool value = take_step_;

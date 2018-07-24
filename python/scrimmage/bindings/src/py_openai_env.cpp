@@ -546,6 +546,7 @@ void ScrimmageOpenAIEnv::reset_scrimmage(bool enable_gui) {
 
 void ScrimmageOpenAIEnv::close() {
     postprocess_scrimmage(mp_, *simcontrol_, log_);
+    simcontrol_->close();
     if (enable_gui_ && system("pkill scrimmage-viz")) {
         // ignore error
     }

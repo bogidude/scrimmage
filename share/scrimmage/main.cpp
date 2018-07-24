@@ -172,6 +172,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     if (sc::postprocess_scrimmage(mp, simcontrol, log)) {
+        simcontrol.close();
         return 0;
     } else {
         return -1;
