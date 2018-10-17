@@ -35,6 +35,12 @@
 
 #include <memory>
 #include <unordered_map>
+#include <string>
+
+#include <scrimmage/plugins/interaction/GraphInteraction/GraphInteraction.h>
+#include <scrimmage/entity/Entity.h>
+
+#include <boost/graph/adjacency_list.hpp>
 
 namespace scrimmage_msgs {
 class Graph;
@@ -48,8 +54,17 @@ namespace scrimmage {
 
 class Plugin;
 
+class Entity;
+using EntityPtr = std::shared_ptr<Entity>;
+
 namespace interaction {
+
 enum class DrawNodeLabels {NO, YES};
+class GraphInteraction;
+
+GraphInteraction::Graph read_graph(std::string filename);
+scrimmage_msgs::Graph boost2protoGraph(GraphInteraction::Graph g, EntityPtr parent_);
+
 void draw_graph(
     scrimmage_msgs::Graph &graph,
     const std::unordered_map<uint64_t, scrimmage_proto::Vector3d> &node_idx_to_pos,

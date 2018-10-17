@@ -59,7 +59,6 @@ class GraphInteraction : public scrimmage::EntityInteraction {
     bool step_entity_interaction(std::list<scrimmage::EntityPtr> &ents,
                                     double t, double dt) override;
 
- protected:
     struct GraphData {
         std::string Name;
     };
@@ -83,6 +82,8 @@ class GraphInteraction : public scrimmage::EntityInteraction {
         boost::vecS,   // vertex storage
         boost::directedS,
         VertexProperties, EdgeProperties> Graph;
+
+ protected:
     Graph g_;
 
  private:
