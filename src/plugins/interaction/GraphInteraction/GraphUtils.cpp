@@ -86,9 +86,7 @@ GraphInteraction::Graph read_graph(std::string filename) {
 scrimmage_msgs::Graph boost2protoGraph(GraphInteraction::Graph boost_g, EntityPtr parent_) {
     std::map<int64_t, Eigen::Vector3d> nodes;
     std::map<int64_t, int64_t> boost_vert_to_osmid;
-    int id_ = 1;
-    auto graph_msg = std::make_shared<scrimmage::Message<scrimmage_msgs::Graph>>();
-    graph_msg->data.set_id(id_);
+    auto graph_ = scrimmage_msgs::GraphPtr();
     for (auto vs = boost::vertices(boost_g); vs.first != vs.second; ++vs.first) {
         double longitude = boost_g[*vs.first].x;
         double latitude = boost_g[*vs.first].y;
@@ -98,7 +96,7 @@ scrimmage_msgs::Graph boost2protoGraph(GraphInteraction::Graph boost_g, EntityPt
         double x, y, z;
         parent_->projection()->Forward(latitude, longitude, 0.0, x, y, z);
         nodes[this_osmid] = Eigen::Vector3d(x, y, z);
-        auto node_ptr = graph_msg->data.add_nodes();
+        auto node_ptr = graph_->add_nodes();
         node_ptr->set_id(this_osmid);
         scrimmage::set(node_ptr->mutable_point(), nodes[this_osmid]);
     }
@@ -107,12 +105,13 @@ scrimmage_msgs::Graph boost2protoGraph(GraphInteraction::Graph boost_g, EntityPt
         int64_t id_start = boost_vert_to_osmid[boost::source(*es.first, boost_g)];
         int64_t id_end = boost_vert_to_osmid[boost::target(*es.first, boost_g)];
 
-        auto edge_ptr = graph_msg->data.add_edges();
+        auto edge_ptr = graph_->add_edges();
         edge_ptr->set_start_node_id(id_start);
         edge_ptr->set_end_node_id(id_end);
         edge_ptr->set_weight(boost_g[*es.first].length);
         edge_ptr->set_label(boost_g[*es.first].name);
     }
+    return *graph_;
 }
 
 void draw_graph(

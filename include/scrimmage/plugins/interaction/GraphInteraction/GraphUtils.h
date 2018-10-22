@@ -44,6 +44,7 @@
 
 namespace scrimmage_msgs {
 class Graph;
+using GraphPtr = std::shared_ptr<Graph>;
 } // namespace scrimmage_msgs
 
 namespace scrimmage_proto {
@@ -56,6 +57,7 @@ class Plugin;
 
 class Entity;
 using EntityPtr = std::shared_ptr<Entity>;
+
 
 namespace interaction {
 
